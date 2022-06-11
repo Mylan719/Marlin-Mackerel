@@ -112,6 +112,7 @@ debug notes:
 // 33 = RAMPS 1.3 / 1.4 (Power outputs: Extruder, Fan, Bed)
 // 34 = RAMPS 1.3 / 1.4 (Power outputs: Extruder0, Extruder1, Bed)
 // 35 = RAMPS 1.3 / 1.4 (Power outputs: Extruder, Fan, Fan)
+// 36 = RAMPS 1.3 / 1.4 (Power outputs: Extruder0, Extruder1, Filament fan) 
 // 4  = Duemilanove w/ ATMega328P pin assignment
 // 5  = Gen6
 // 51 = Gen6 deluxe
@@ -142,7 +143,7 @@ debug notes:
 // 21 = Elefu Ra Board (v3)
 
 #ifndef MOTHERBOARD
-#define MOTHERBOARD 34  //FMM only works for this motherboard currently
+#define MOTHERBOARD 36  //Lutra Ex RAPMS 1.4 configuration
 #endif
 
 // Define this to set a custom name for your generic Mendel,
@@ -342,7 +343,7 @@ debug notes:
 #define EXTRUDER_RPM_PID_INTEGRATOR_WIND_LIMIT 100000000 //absolute value of integrator windup max value
 #define EXTRUDER_RPM_DT 1.0 //Time step for PID
 
-//#define USE_WINDER_STEPPER
+#define USE_WINDER_STEPPER
 
 #define DEFAULT_LENGTH_CUTOFF 150000  //length in mm where extruder will shut down
 

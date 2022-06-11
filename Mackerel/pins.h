@@ -375,7 +375,7 @@
 * Arduino Mega pin assignment
 *
 ****************************************************************************************/
-#if MOTHERBOARD == 3 || MOTHERBOARD == 33 || MOTHERBOARD == 34 || MOTHERBOARD == 35 || MOTHERBOARD == 77 || MOTHERBOARD == 67 || MOTHERBOARD == 68
+#if MOTHERBOARD == 3 || MOTHERBOARD == 33 || MOTHERBOARD == 34 || MOTHERBOARD == 35 || MOTHERBOARD == 36 || MOTHERBOARD == 77 || MOTHERBOARD == 67 || MOTHERBOARD == 68
 #define KNOWN_BOARD 1
 
 //////////////////FIX THIS//////////////
@@ -391,7 +391,7 @@
 // #define RAMPS_V_1_0
 
 
-#if MOTHERBOARD == 33 || MOTHERBOARD == 34 || MOTHERBOARD == 35 || MOTHERBOARD == 77 || MOTHERBOARD == 67 || MOTHERBOARD == 68
+#if MOTHERBOARD == 33 || MOTHERBOARD == 34 || MOTHERBOARD == 35 || MOTHERBOARD == 36 || MOTHERBOARD == 77 || MOTHERBOARD == 67 || MOTHERBOARD == 68
 
   #define LARGE_FLASH true
 
@@ -441,20 +441,31 @@
     #define X_STEP_PIN         54
     #define X_DIR_PIN          55
     #define X_ENABLE_PIN       38
-    #define X_MIN_PIN           3
-    #define X_MAX_PIN           2
-
+    
     #define Y_STEP_PIN         60
     #define Y_DIR_PIN          61
     #define Y_ENABLE_PIN       56
-    #define Y_MIN_PIN          14
-    #define Y_MAX_PIN          15
+    
 
     #define Z_STEP_PIN         46
     #define Z_DIR_PIN          48
     #define Z_ENABLE_PIN       62
-    #define Z_MIN_PIN          18
-    #define Z_MAX_PIN          19
+    
+    #if MOTHERBOARD == 34 || MOTHERBOARD == 36  
+      #define X_MAX_PIN          -1 //FMM remove definition for limit pins to speed up the stepper interrupt.
+	    #define Y_MAX_PIN          -1
+      #define Z_MAX_PIN          -1
+      #define X_MIN_PIN          -1
+      #define Y_MIN_PIN          -1
+      #define Z_MIN_PIN          -1
+    #else
+      #define X_MIN_PIN           3
+      #define X_MAX_PIN           2
+      #define Z_MIN_PIN          18
+      #define Z_MAX_PIN          19
+      #define Y_MIN_PIN          14
+      #define Y_MAX_PIN          15
+    #endif
 
     #define Y2_STEP_PIN        36
     #define Y2_DIR_PIN         34
@@ -490,38 +501,39 @@
     #define SDSS               53
     #define LED_PIN            13
 
-	#if MOTHERBOARD == 34  //FMM added for Filament Extruder
-	  //define analog pin for the filament width sensor input
-	  //Use the RAMPS 1.4 Analog input 5 on the AUX2 connector
+	  #if MOTHERBOARD == 34 || MOTHERBOARD == 36 //FMM added for Filament Extruder
+      //define analog pin for the filament width sensor input
+      //Use the RAMPS 1.4 Analog input 5 on the AUX2 connector
       #define FILWIDTH_PIN        5
-	  //Use the RAMPS 1.4 Digital input D3 (usually XMIN endstop pin)
-	  
+	    //Use the RAMPS 1.4 Digital input D3 (usually XMIN endstop pin)
       #define BLOBWIDTH_PIN 	  3
       //Use the RAMPS 1.4 Analog input A3, Digital 57
-
-	  #define EXTRUDER_MOTOR_ON_OFF_PIN		3
-      #define X_MAX_PIN -1 //FMM remove definition for limit pins to speed the stepper interrupt.
-	  #define Y_MAX_PIN -1
-      #define Z_MAX_PIN -1
-      #define X_MIN_PIN -1
-      #define Y_MIN_PIN -1
-      #define Z_MIN_PIN -1
+	    #define EXTRUDER_MOTOR_ON_OFF_PIN		3
     #endif
 
   #endif
 
   #if MOTHERBOARD == 33 || MOTHERBOARD == 35 || MOTHERBOARD == 67 || MOTHERBOARD == 68
     #define FAN_PIN            9 // (Sprinter config)
-  #else
+  #elif MOTHERBOARD == 34
     #define WINDER_OR_FAN_PIN            8 // FMM used for the winder motor
+    #define FAN_PIN                     -1
+  #elif MOTHERBOARD == 36
+    #define FAN_PIN                     -1 // (Sprinter config)
+    #define WINDER_OR_FAN_PIN           -1
+  #else
+    #define WINDER_OR_FAN_PIN           -1
   #endif
 
   #if MOTHERBOARD == 77
     #define FAN_PIN            8
   #endif
 
-  #if MOTHERBOARD == 35
-    #define CONTROLLERFAN_PIN  10 //Pin used for the fan to cool controller
+  #if MOTHERBOARD == 35 || MOTHERBOARD == 36
+    #define CONTROLLERFAN_PIN  10 //Pin used for the fan to cool controller, in case of filamet extruder cooling filament
+  #endif
+  #if MOTHERBOARD == 34
+    #define CONTROLLERFAN_PIN   9
   #endif
 
  //#define PS_ON_PIN          12
@@ -533,7 +545,7 @@
     #define KILL_PIN           -1
   #endif
 
-  #if MOTHERBOARD == 35
+  #if MOTHERBOARD == 35 || MOTHERBOARD == 36
     #define HEATER_0_PIN       8
   #else
     #define HEATER_0_PIN       10   // EXTRUDER 1
@@ -541,8 +553,10 @@
 
   #if MOTHERBOARD == 33 || MOTHERBOARD == 67
     #define HEATER_1_PIN       -1
+  #elif MOTHERBOARD == 36
+    #define HEATER_1_PIN       9
   #else
-    #define HEATER_1_PIN       9    // EXTRUDER 2 (FAN On Sprinter)
+    #define HEATER_1_PIN       8    // EXTRUDER 2 (FAN On Sprinter)
   #endif
 
 
@@ -573,7 +587,7 @@
     #define TEMP_2_PIN         -1   // ANALOG NUMBERING
   #endif
 
-  #if MOTHERBOARD == 35
+  #if MOTHERBOARD == 35 || MOTHERBOARD == 36
     #define HEATER_BED_PIN     -1    // NO BED
   #else
     #if MOTHERBOARD == 77
@@ -2591,7 +2605,7 @@
 #endif
 
 #define SENSITIVE_PINS {0, 1, X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN, X_MIN_PIN, X_MAX_PIN, Y_STEP_PIN, Y_DIR_PIN, Y_ENABLE_PIN, Y_MIN_PIN, Y_MAX_PIN, Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_MIN_PIN, Z_MAX_PIN, PS_ON_PIN, \
-                        HEATER_BED_PIN, WINDER_OR_FAN_PIN,                  \
+                        HEATER_BED_PIN, WINDER_OR_FAN_PIN,                 \
                         _E0_PINS _P_PINS _E2_PINS             \
                         analogInputToDigitalPin(TEMP_0_PIN), analogInputToDigitalPin(TEMP_1_PIN), analogInputToDigitalPin(TEMP_2_PIN), analogInputToDigitalPin(TEMP_BED_PIN) }
 #endif

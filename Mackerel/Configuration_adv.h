@@ -61,7 +61,6 @@
 //FMM This is for controlling a fan to cool down the extruded filament
 //it will turn on when any driver is enabled
 //and turn off after the set amount of seconds from last driver being disabled again
-#define CONTROLLERFAN_PIN 9 //Pin used for the fan to cool filament (-1 to disable)
 #define CONTROLLERFAN_SECS 60 //How many seconds, after all motors were disabled, the fan should run
 #define CONTROLLERFAN_SPEED 255  // == full speed
 
@@ -381,7 +380,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 #endif
 
 // Control heater 0 and heater 1 in parallel.
-//#define HEATERS_PARALLEL
+#define HEATERS_PARALLEL
 
 //===========================================================================
 //=============================Buffers           ============================
