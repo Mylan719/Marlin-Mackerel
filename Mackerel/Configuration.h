@@ -295,10 +295,10 @@ debug notes:
 #define DEFAULT_PULLER_FEEDRATE 2.0 //default puller feedrate when turned on
 #define PULLER_FEEDRATE_MIN 0.5 // min feedrate in manual control, 1 mm/sec min feed - limited by max pulse rate of 50,000
 #define PULLER_FEEDRATE_MAX 35.0  // max feedrate in manual control 15mm/sec max feed - limited by max pulse rate of 50,000
-#define PULLER_WHEEL_CIRC 120 //circumference of urethane puller wheel in mm
+#define PULLER_WHEEL_CIRC 125.7 //circumference of urethane puller wheel in mm
 
 #define DEFAULT_WINDER_RPM_FACTOR 70  //factor for converting winder PW to rpm - reflects rpm of motor at 12v
-#define DEFAULT_WINDER_SPEED 25  //default winder speed (0-DEFAULT_WINDER_RPM_FACTOR)
+#define DEFAULT_WINDER_SPEED 2  //default winder speed (0-DEFAULT_WINDER_RPM_FACTOR)
 
 
 #define DESIRED_FILAMENT_DIA 1.65 //define the default desired Filament diameter
@@ -354,12 +354,13 @@ debug notes:
 
 
 #define DEFAULT_ESTEP_PER_REV 489.6  //default setting for the extruder step calibration  1:15.3 gear
-#define DEFAULT_PSTEP_PER_MM 375.3  //default setting for the puller motor step calibration  1:14 gear
+#define DEFAULT_PSTEP_PER_MM 356.4  //default setting for the puller motor step calibration  1:14 gear
+#define DEFAULT_WSTEP_PER_MM 47.85 //Big spool, 1:9.75 gear reduction
 
 //The next two defines have arrays of 5 values which correspond to the 5 axis X,Y,Z,E,P
 //For the Lyman Extruder, only E = Extruder Motor and P = Puller Motor settings are utilized
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {78.7402,78.7402,200.0*8/3,DEFAULT_ESTEP_PER_REV, DEFAULT_PSTEP_PER_MM}    
-#define DEFAULT_MAX_FEEDRATE          {500, 500, 5, 50, 50}    // (mm/sec) 
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {DEFAULT_WSTEP_PER_MM,78.7402,200.0*8/3,DEFAULT_ESTEP_PER_REV, DEFAULT_PSTEP_PER_MM}    
+#define DEFAULT_MAX_FEEDRATE          {200, 200, 5, 200, 200}    // (mm/sec) 
 
 #define DEFAULT_MOTOR_ACCELERATION  200   // E and P max acceleration in mm/s^2 - controls extruder acceleration
 #define DEFAULT_EJERK                 1.0    // (mm/sec)
