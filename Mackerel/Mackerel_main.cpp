@@ -937,8 +937,16 @@ void loop()
 	  current_position[E_AXIS]=destination[E_AXIS];
 	  current_position[P_AXIS]=destination[P_AXIS]; 
 #else
-    int max_move_feedrate = max(extruder_feedrate, max(puller_feedrate, (float)default_winder_speed));
-	  plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], destination[P_AXIS], max_move_feedrate , active_extruder);  //FMM added P_AXIS
+    SERIAL_PROTOCOLPGM(" extruder_feedrate: ");
+    SERIAL_PROTOCOL(extruder_feedrate);
+    SERIAL_PROTOCOLPGM(" puller_feedrate: ");
+    SERIAL_PROTOCOL(puller_feedrate);
+    SERIAL_PROTOCOLPGM(" default_winder_speed: ");
+    SERIAL_PROTOCOL(default_winder_speed);
+    SERIAL_PROTOCOLPGM("\n");
+    float max_move_feedrate = max(extruder_feedrate, max(puller_feedrate, default_winder_speed));
+
+	  plan_buffer_synchronized_relative_move(winder_increment, 0, 0, extruder_increment, puller_increment, max_move_feedrate, active_extruder);
 	  
     current_position[X_AXIS]=destination[X_AXIS];
     current_position[E_AXIS]=destination[E_AXIS];

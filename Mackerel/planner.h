@@ -90,6 +90,8 @@ vector_3 plan_get_position();
 #else
 void plan_buffer_line(const float &x, const float &y, const float &z, const float &e, const float &p,float feed_rate, const uint8_t &extruder);
 #endif // ENABLE_AUTO_BED_LEVELING
+void plan_buffer_synchronized_relative_move(const float &x, const float &y, const float &z, const float &e, const float &p, float feed_rate, const uint8_t &extruder);  //FMM added p parameter
+
 
 // Set position. Used for G92 instructions.
 #ifdef ENABLE_AUTO_BED_LEVELING
