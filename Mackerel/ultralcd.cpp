@@ -1667,7 +1667,10 @@ char *itostr2(const uint8_t &x)
 {
   //sprintf(conv,"%5.1f",x);
   int xx=x;
-  conv[0]=(xx/10)%10+'0';
+  if (xx >= 10)
+    conv[0]=(xx/10)%10+'0';
+  else
+    conv[0]=' ';
   conv[1]=(xx)%10+'0';
   conv[2]=0;
   return conv;
@@ -1679,8 +1682,14 @@ char *ftostr31(const float &x)
   int xx=x*10;
   conv[0]=(xx>=0)?'+':'-';
   xx=abs(xx);
-  conv[1]=(xx/1000)%10+'0';
-  conv[2]=(xx/100)%10+'0';
+  if (xx >= 1000)
+    conv[1]=(xx/1000)%10+'0';
+  else
+    conv[1]=' ';
+  if (xx >= 100)
+    conv[2]=(xx/100)%10+'0';
+  else
+    conv[2]=' ';
   conv[3]=(xx/10)%10+'0';
   conv[4]='.';
   conv[5]=(xx)%10+'0';
@@ -1692,10 +1701,15 @@ char *ftostr31(const float &x)
 char *ftostr31ns(const float &x)
 {
   int xx=x*10;
-  //conv[0]=(xx>=0)?'+':'-';
   xx=abs(xx);
-  conv[0]=(xx/1000)%10+'0';
-  conv[1]=(xx/100)%10+'0';
+  if (xx >= 1000)
+    conv[0]=(xx/1000)%10+'0';
+  else
+    conv[0]=' ';
+  if (xx >= 100)
+    conv[1]=(xx/100)%10+'0';
+  else
+    conv[1]=' ';
   conv[2]=(xx/10)%10+'0';
   conv[3]='.';
   conv[4]=(xx)%10+'0';
@@ -1709,7 +1723,10 @@ char *ftostr22(const float &x)
 {
   long xx=x*100;
   if (xx >= 0)
-    conv[0]=(xx/1000)%10+'0';
+    if (abs(xx) >= 1000)
+        conv[0]=(xx/1000)%10+'0';
+    else
+        conv[0]=' ';
   else
     conv[0]='-';
   xx=abs(xx);
@@ -1725,7 +1742,10 @@ char *ftostr21(const float &x)
 {
   long xx=x*10;
   if (xx >= 0)
-    conv[0]=(xx/100)%10+'0';
+    if (abs(xx) >= 100)
+        conv[0]=(xx/100)%10+'0';
+    else
+        conv[0]=' ';
   else
     conv[0]='-';
   xx=abs(xx);
@@ -1740,7 +1760,7 @@ char *ftostr12(const float &x)
 {
   long xx=x*100;
   if (xx >= 0)
-    conv[0]=(xx/100)%10+'0';
+      conv[0]=(xx/100)%10+'0';   
   else
     conv[0]='-';
   xx=abs(xx);
@@ -1755,11 +1775,17 @@ char *ftostr32(const float &x)
 {
   long xx=x*100;
   if (xx >= 0)
-    conv[0]=(xx/10000)%10+'0';
+    if (abs(xx) >= 10000)
+      conv[0]=(xx/10000)%10+'0';
+    else
+      conv[0]= ' ';
   else
     conv[0]='-';
   xx=abs(xx);
-  conv[1]=(xx/1000)%10+'0';
+  if (xx >= 1000)
+    conv[1]=(xx/1000)%10+'0';
+  else
+    conv[1]= ' ';
   conv[2]=(xx/100)%10+'0';
   conv[3]='.';
   conv[4]=(xx/10)%10+'0';
@@ -1772,11 +1798,18 @@ char *ftostr32(const float &x)
 char *itostr31(const int &xx)
 {
   conv[0]=(xx>=0)?'+':'-';
-  conv[1]=(xx/1000)%10+'0';
-  conv[2]=(xx/100)%10+'0';
-  conv[3]=(xx/10)%10+'0';
+  const long n=abs(xx);
+  if (n >= 1000)
+    conv[1]=(n/1000)%10+'0';
+  else
+    conv[1]= ' ';
+  if (n >= 100)
+    conv[2]=(n/100)%10+'0';
+  else
+    conv[2]= ' ';
+  conv[3]=(n/10)%10+'0';
   conv[4]='.';
-  conv[5]=(xx)%10+'0';
+  conv[5]=(n)%10+'0';
   conv[6]=0;
   return conv;
 }
@@ -1902,9 +1935,18 @@ char *ftostr51(const float &x)
   long xx=x*10;
   conv[0]=(xx>=0)?'+':'-';
   xx=abs(xx);
-  conv[1]=(xx/10000)%10+'0';
-  conv[2]=(xx/1000)%10+'0';
-  conv[3]=(xx/100)%10+'0';
+  if (xx >= 10000)
+    conv[1]=(xx/10000)%10+'0';
+  else
+    conv[1]=' ';
+  if (xx >= 1000)
+    conv[2]=(xx/1000)%10+'0';
+  else
+    conv[2]=' ';  
+  if (xx >= 100)
+    conv[3]=(xx/100)%10+'0';
+  else
+    conv[3]=' '; 
   conv[4]=(xx/10)%10+'0';
   conv[5]='.';
   conv[6]=(xx)%10+'0';
@@ -1918,8 +1960,14 @@ char *ftostr52(const float &x)
   long xx=x*100;
   conv[0]=(xx>=0)?'+':'-';
   xx=abs(xx);
-  conv[1]=(xx/10000)%10+'0';
-  conv[2]=(xx/1000)%10+'0';
+  if (xx >= 10000)
+    conv[1]=(xx/10000)%10+'0';
+  else
+    conv[1]=' ';
+  if (xx >= 1000)
+    conv[2]=(xx/1000)%10+'0';
+  else
+    conv[2]=' ';
   conv[3]=(xx/100)%10+'0';
   conv[4]='.';
   conv[5]=(xx/10)%10+'0';
@@ -1934,7 +1982,10 @@ char *ftostr53(const float &x)
   long xx=x*1000;
   conv[0]=(xx>=0)?'+':'-';
   xx=abs(xx);
-  conv[1]=(xx/10000)%10+'0';
+  if (xx >= 10000)
+    conv[1]=(xx/10000)%10+'0';
+  else
+    conv[1]=' ';
   conv[2]=(xx/1000)%10+'0';
   conv[3]='.';
   conv[4]=(xx/100)%10+'0';
