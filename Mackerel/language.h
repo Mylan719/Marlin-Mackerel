@@ -61,10 +61,9 @@
 // Common serial messages
 #define MSG_MARLIN "Mackerel"
 
-#define SPLASH1 "    Lyman/Mulier"
-#define SPLASH2 " Filament Extruder"
-#define SPLASH3 "        V5.0"
-
+#define SPLASH1 "Lutra EX"
+#define SPLASH2 "based on Lyman/Mulier"
+#define SPLASH3 "Filament Extruder V5.0"
 
 #if LANGUAGE_CHOICE == 1
 

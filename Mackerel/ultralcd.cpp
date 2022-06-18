@@ -210,7 +210,6 @@ static void lcd_status_screen()
 #ifdef ULTIPANEL
     if (LCD_CLICKED)
     {
-    	lcd_implementation_init();  //FMM debug - re-initialize LCD -see if it helps for when screen goes wacky   
     	currentMenu = lcd_main_menu;
         encoderPosition = 0;
         lcd_quick_feedback();
@@ -218,48 +217,17 @@ static void lcd_status_screen()
     }
 
 #ifdef ULTIPANEL_FEEDMULTIPLY
-    // Dead zone at 100% feedrate
-    /*
-    if ((feedmultiply < 100 && (feedmultiply + int(encoderPosition)) > 100) ||
-            (feedmultiply > 100 && (feedmultiply + int(encoderPosition)) < 100))
-    {
-        encoderPosition = 0;
-        feedmultiply = 100;
-    }
-
-    if (feedmultiply == 100 && int(encoderPosition) > ENCODER_FEEDRATE_DEADZONE)
-    {
-        feedmultiply += int(encoderPosition) - ENCODER_FEEDRATE_DEADZONE;
-        encoderPosition = 0;
-    }
-    else if (feedmultiply == 100 && int(encoderPosition) < -ENCODER_FEEDRATE_DEADZONE)
-    {
-        feedmultiply += int(encoderPosition) + ENCODER_FEEDRATE_DEADZONE;
-        encoderPosition = 0;
-    }
-    else if (feedmultiply != 100)
-    {
-        feedmultiply += int(encoderPosition);
-        encoderPosition = 0;
-    }
-    */
+   
     puller_feedrate += ((float)(int(encoderPosition)))*0.01;  //update puller_feedrate by .01 mm/sec increments
     encoderPosition = 0;
     
 #endif//ULTIPANEL_FEEDMULTIPLY
-    /*
-    if (feedmultiply < 10)
-        feedmultiply = 10;
-    if (feedmultiply > FEEDMULTIPLY_MAX)
-        feedmultiply = FEEDMULTIPLY_MAX;
-        
-    */
+
     if (puller_feedrate < PULLER_FEEDRATE_MIN)
     	puller_feedrate = PULLER_FEEDRATE_MIN;
     if (puller_feedrate > PULLER_FEEDRATE_MAX)
     	puller_feedrate = PULLER_FEEDRATE_MAX;
-        
-        
+              
 #endif//ULTIPANEL
 }
 

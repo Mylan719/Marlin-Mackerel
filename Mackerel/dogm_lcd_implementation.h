@@ -100,15 +100,6 @@ static void lcd_implementation_init()
 	//  pinMode(17, OUTPUT);	// Enable LCD backlight
 	//  digitalWrite(17, HIGH);
 
-	u8g.firstPage();
-	do
-	{
-		u8g.setFont(u8g_font_6x10_marlin);
-		u8g.setColorIndex(1);
-		u8g.drawBox(0, 0, u8g.getWidth(), u8g.getHeight());
-		u8g.setColorIndex(1);
-	} while (u8g.nextPage());
-
 #ifdef LCD_SCREEN_ROT_90
 	u8g.setRot90(); // Rotate screen by 90Â°
 #endif
@@ -124,7 +115,7 @@ static void lcd_implementation_init()
 	u8g.firstPage();
 	do
 	{
-		u8g.setFont(u8g_font_5x8);
+		u8g.setFont(u8g_font_6x10_marlin);
 		u8g.drawStr(5, 20, SPLASH1);
 		u8g.setFont(u8g_font_5x8);
 		u8g.drawStr(5, 30, SPLASH2);
