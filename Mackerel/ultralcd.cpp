@@ -53,7 +53,7 @@ static void lcd_main_menu();
 static void lcd_tune_menu();
 static void lcd_prepare_menu();
 static void lcd_move_menu();
-static void lcd_control_menu();
+static void lcd_configuration_menu();
 static void lcd_control_temperature_menu();
 static void lcd_control_Filament_PID_menu();
 static void lcd_control_Blob_PID_menu();
@@ -326,7 +326,7 @@ static void lcd_extruder_pause()
     lcd_disable_statistics();
 }
 
-static void lcd_extruder_resume()
+static void lcd_extruder_start()
 {
 	//feedmultiply=DEFAULT_FEEDMULTIPLY;
 	puller_feedrate = puller_feedrate_default;   //use default feed rate
@@ -377,7 +377,6 @@ static void lcd_sdcard_stop()
 void lcd_preheat_extruder()
 {
     setTargetHotend0(absPreheatHotendTemp);
-   // setTargetBed(absPreheatHPBTemp);
     
     LCD_MESSAGEPGM("Extruder Warming Up");
     lcd_return_to_status();
@@ -397,66 +396,57 @@ void lcd_cooldown()
 }
 
 
+static void lcd_preheat_menu()
+{
+    START_MENU();
+    MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
+    MENU_ITEM(function, MSG_PREHEAT, lcd_preheat_extruder);
+    MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
+    END_MENU();
+}
+
 /* Menu implementation */
 static void lcd_main_menu()
 {
     START_MENU();
     MENU_ITEM(back, MSG_WATCH, lcd_status_screen);
     
-    if ((extrude_status & ES_ENABLE_SET) >0)
-       	{
-        #if defined(FILAMENT_SENSOR) || defined(BLOB_SENSOR)
-    	if((extrude_status & ES_AUTO_SET) >0)
-    		MENU_ITEM(function,MSG_MAN_EXTRUDER,lcd_extruder_manual);
-    	else
-    		MENU_ITEM(function,MSG_AUTO_EXTRUDER,lcd_extruder_automatic);
-        #endif
-    	MENU_ITEM(function, MSG_PAUSE_EXTRUDER, lcd_extruder_pause);
-       	}
-       else
-       	MENU_ITEM(function, MSG_RESUME_EXTRUDER, lcd_extruder_resume);
-    
-    MENU_ITEM(function, MSG_CLEAR_STATS, lcd_clear_statistics);
-    if((extrude_status & ES_STATS_SET)>0)
-    	MENU_ITEM(function, MSG_DISABLE_STATS, lcd_disable_statistics);
-    else
-    	MENU_ITEM(function, MSG_ENABLE_STATS, lcd_enable_statistics);
-    
+    MENU_ITEM(submenu, MSG_PREHEAT, lcd_preheat_menu);
     if (movesplanned() || IS_SD_PRINTING)
     {
         MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
     }else{
         MENU_ITEM(submenu, MSG_PREPARE, lcd_prepare_menu);
     }
-    MENU_ITEM(function, MSG_PREHEAT_ABS, lcd_preheat_extruder);
-    MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
-    MENU_ITEM(submenu, MSG_CONTROL, lcd_control_menu);
-   
-/*
-#ifdef SDSUPPORT
-    if (card.cardOK)
+
+    if ((extrude_status & ES_ENABLE_SET) >0)
     {
-        if (card.isFileOpen())
-        {
-            if (card.sdprinting)
-                MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
-            else
-                MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
-            MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
-        }else{
-            MENU_ITEM(submenu, MSG_CARD_MENU, lcd_sdcard_menu);
-#if SDCARDDETECT < 1
-            MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
-#endif
-        }
-    }else{
-        MENU_ITEM(submenu, MSG_NO_CARD, lcd_sdcard_menu);
-#if SDCARDDETECT < 1
-        MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
-#endif
+    	MENU_ITEM(function, MSG_PAUSE_EXTRUDER, lcd_extruder_pause);
     }
-#endif
-*/
+    else
+    {
+       	MENU_ITEM(function, MSG_START_EXTRUDER, lcd_extruder_start);
+    }
+
+    #if defined(FILAMENT_SENSOR) || defined(BLOB_SENSOR)
+    if ((extrude_status & ES_ENABLE_SET) >0)
+    {       
+    	if((extrude_status & ES_AUTO_SET) >0)
+    		MENU_ITEM(function,MSG_MAN_EXTRUDER,lcd_extruder_manual);
+    	else
+    		MENU_ITEM(function,MSG_AUTO_EXTRUDER,lcd_extruder_automatic);        
+    }
+    #endif
+
+    MENU_ITEM(function, MSG_CLEAR_STATS, lcd_clear_statistics);
+
+    if((extrude_status & ES_STATS_SET)>0)
+    	MENU_ITEM(function, MSG_DISABLE_STATS, lcd_disable_statistics);
+    else
+    	MENU_ITEM(function, MSG_ENABLE_STATS, lcd_enable_statistics);
+    
+    MENU_ITEM(submenu, MSG_CONFIGURATION, lcd_configuration_menu);
+   
     END_MENU();
 }
 
@@ -541,6 +531,11 @@ static void lcd_tune_menu()
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM_EDIT(float32, MSG_EXT_RPM, &extruder_rpm_set,EXTRUDER_RPM_MIN,EXTRUDER_RPM_MAX);
     MENU_ITEM_EDIT(float32, MSG_SPEED, &puller_feedrate, PULLER_FEEDRATE_MIN, PULLER_FEEDRATE_MAX);
+#ifdef USE_WINDER_STEPPER
+    MENU_ITEM_EDIT(int3, MSG_WINDER_SPEED_MM, &default_winder_speed, 0, DEFAULT_WINDER_RPM_FACTOR);
+#else
+    MENU_ITEM_EDIT(int3, MSG_WINDER_SPEED_RPM, &default_winder_speed, 0, DEFAULT_WINDER_RPM_FACTOR);
+#endif
     MENU_ITEM_EDIT(int3, MSG_HEATER, &target_temperature[0], 0, HEATER_0_MAXTEMP - 15);
 #if TEMP_SENSOR_1 != 0
     MENU_ITEM_EDIT(int3, MSG_NOZZLE1, &target_temperature[1], 0, HEATER_1_MAXTEMP - 15);
@@ -558,11 +553,7 @@ static void lcd_tune_menu()
     MENU_ITEM_EDIT(float32,MSG_BLOB, &blob_width_desired,1.0,6.0);
 #endif
     MENU_ITEM_EDIT(float6,MSG_LENGTH_CUTOFF, &fil_length_cutoff,1000,999000);
-    MENU_ITEM_EDIT(int3, MSG_WINDER_SPEED, &default_winder_speed, 0, DEFAULT_WINDER_RPM_FACTOR);
 
-    
- //   MENU_ITEM_EDIT(int3, MSG_FLOW, &extrudemultiply, 10, 999);
- //   MENU_ITEM_EDIT(int3, MSG_FLOW0, &extruder_multiply[0], 10, 999);
 #if TEMP_SENSOR_1 != 0
     MENU_ITEM_EDIT(int3, MSG_FLOW1, &extruder_multiply[1], 10, 999);
 #endif
@@ -733,34 +724,26 @@ static void lcd_prepare_menu()
 {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
-    MENU_ITEM_EDIT(float22, MSG_EXT_RPM, &extruder_rpm_set,EXTRUDER_RPM_MIN,EXTRUDER_RPM_MAX);
+    MENU_ITEM_EDIT(float22, MSG_EXT_RPM, &extruder_rpm_set, EXTRUDER_RPM_MIN,EXTRUDER_RPM_MAX);
     MENU_ITEM_EDIT(float22, MSG_SPEED, &puller_feedrate_default, PULLER_FEEDRATE_MIN, PULLER_FEEDRATE_MAX);
+
+#ifdef USE_WINDER_STEPPER
+    MENU_ITEM_EDIT(int3, MSG_WINDER_SPEED_MM, &default_winder_speed, 0, DEFAULT_WINDER_RPM_FACTOR);
+#else
+    MENU_ITEM_EDIT(int3, MSG_WINDER_SPEED_RPM, &default_winder_speed, 0, DEFAULT_WINDER_RPM_FACTOR);
+#endif
 #ifdef FILAMENT_SENSOR
-    MENU_ITEM_EDIT(float32,MSG_FILAMENT, &filament_width_desired,1.0,3.0);
+    MENU_ITEM_EDIT(float32, MSG_FILAMENT, &filament_width_desired,1.0,3.0);
 #endif
 #ifdef BLOB_SENSOR
     MENU_ITEM_EDIT(float32,MSG_BLOB, &blob_width_desired,1.0,6.0);
 #endif
-    MENU_ITEM_EDIT(float6,MSG_LENGTH_CUTOFF, &fil_length_cutoff,1000,999000);
-    MENU_ITEM_EDIT(int3, MSG_WINDER_SPEED, &default_winder_speed, 0, DEFAULT_WINDER_RPM_FACTOR);
+    MENU_ITEM_EDIT(float6,MSG_LENGTH_CUTOFF, &fil_length_cutoff,1000,999000);   
 #ifdef SDSUPPORT
     #ifdef MENU_ADDAUTOSTART
       MENU_ITEM(function, MSG_AUTOSTART, lcd_autostart_sd);
     #endif
 #endif
-//    MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
- //   MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
-    //MENU_ITEM(gcode, MSG_SET_ORIGIN, PSTR("G92 X0 Y0 Z0"));
-#if TEMP_SENSOR_0 != 0
-  #if TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 || TEMP_SENSOR_BED != 0
-    MENU_ITEM(submenu, MSG_PREHEAT_PLA, lcd_preheat_pla_menu);
-    MENU_ITEM(submenu, MSG_PREHEAT_ABS, lcd_preheat_abs_menu);
-  #else
- //   MENU_ITEM(function, MSG_PREHEAT_PLA, lcd_preheat_pla0);
-    MENU_ITEM(function, MSG_PREHEAT_ABS, lcd_preheat_extruder);
-  #endif
-#endif
-//    MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
 #if PS_ON_PIN > -1
     if (powersupply)
     {
@@ -769,7 +752,7 @@ static void lcd_prepare_menu()
         MENU_ITEM(gcode, MSG_SWITCH_PS_ON, PSTR("M80"));
     }
 #endif
-    MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);  //FMM remove the move functionality from the menu
+    MENU_ITEM(submenu, MSG_MOVE_AXIS, lcd_move_menu);
     END_MENU();
 }
 
@@ -957,7 +940,7 @@ static void lcd_move_menu()
     END_MENU();
 }
 
-static void lcd_control_menu()
+static void lcd_configuration_menu()
 {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
@@ -988,7 +971,7 @@ static void lcd_control_menu()
 static void lcd_control_Filament_PID_menu()
 	{
 	START_MENU();
-	MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
+	MENU_ITEM(back, MSG_CONFIGURATION, lcd_configuration_menu);
 	MENU_ITEM_EDIT(float32,MSG_FILAMENT, &filament_width_desired,1.0,3.0);
 	MENU_ITEM_EDIT(float6,MSG_LENGTH_CUTOFF, &fil_length_cutoff,1000,999000);
 	MENU_ITEM_EDIT(float53, MSG_PID_P, &fwidthKp, 0.0, 99.999);
@@ -1000,7 +983,7 @@ static void lcd_control_Filament_PID_menu()
 static void lcd_control_Blob_PID_menu()
 	{
 	START_MENU();
-	MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
+	MENU_ITEM(back, MSG_CONFIGURATION, lcd_configuration_menu);
 	MENU_ITEM_EDIT(float32,MSG_BLOB, &blob_width_desired,1.0,6.0);
 	MENU_ITEM_EDIT(float53, MSG_PID_P, &bwidthKp, 0.0, 99.999);
 	MENU_ITEM_EDIT(float53, MSG_PID_I, &bwidthKi, 0.0, 99.999);
@@ -1026,7 +1009,7 @@ static void lcd_control_temperature_menu()
 #endif
 
     START_MENU();
-    MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
+    MENU_ITEM(back, MSG_CONFIGURATION, lcd_configuration_menu);
     MENU_ITEM_EDIT(int3, MSG_HEATER, &target_temperature[0], 0, HEATER_0_MAXTEMP - 15);
 #if TEMP_SENSOR_1 != 0
     MENU_ITEM_EDIT(int3, MSG_NOZZLE1, &target_temperature[1], 0, HEATER_1_MAXTEMP - 15);
@@ -1058,9 +1041,6 @@ static void lcd_control_temperature_menu()
     MENU_ITEM(function,MSG_AUTOTUNE,pid_autotune_action);  //FMM add autotune action here
     END_MENU();
 }
-
-
-
 
 static void lcd_control_temperature_preheat_pla_settings_menu()
 {
@@ -1095,7 +1075,7 @@ static void lcd_control_temperature_preheat_abs_settings_menu()
 static void lcd_control_motion_menu()
 {
     START_MENU();
-    MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
+    MENU_ITEM(back, MSG_CONFIGURATION, lcd_configuration_menu);
 #ifdef ENABLE_AUTO_BED_LEVELING
     MENU_ITEM_EDIT(float32, MSG_ZPROBE_ZOFFSET, &zprobe_zoffset, 0.5, 50);
 #endif
@@ -1147,7 +1127,7 @@ static void lcd_set_contrast()
     if (LCD_CLICKED)
     {
         lcd_quick_feedback();
-        currentMenu = lcd_control_menu;
+        currentMenu = lcd_configuration_menu;
         encoderPosition = 0;
     }
 }
@@ -1157,7 +1137,7 @@ static void lcd_set_contrast()
 static void lcd_control_retract_menu()
 {
     START_MENU();
-    MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
+    MENU_ITEM(back, MSG_CONFIGURATION, lcd_configuration_menu);
     MENU_ITEM_EDIT(bool, MSG_AUTORETRACT, &autoretract_enabled);
     MENU_ITEM_EDIT(float52, MSG_CONTROL_RETRACT, &retract_length, 0, 100);
     MENU_ITEM_EDIT(float3, MSG_CONTROL_RETRACTF, &retract_feedrate, 1, 999);
